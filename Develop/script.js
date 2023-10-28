@@ -43,6 +43,9 @@ $(document).ready(function () {
         // saving the hour as a value to the save button and an id to the textarea
         saveButton.attr({ value: hour });
         taskText.attr({ id: hour });
+
+        // if there is locally stored data for this specific hour, then the data will be displayed inside the texarea
+        writeText(hour, taskText)
       } else {
         // if the hour is after 12 it will end with PM
         amPM = "PM";
@@ -55,6 +58,7 @@ $(document).ready(function () {
         // saving the hour as a value to the save button and an id to the textarea
         saveButton.attr({ value: pmConverter });
         taskText.attr({ id: pmConverter });
+        writeText(pmConverter, taskText)
       }
       // if the hour is before the current time it will be designated with class "past"
       if (hour < currentHour) {
@@ -71,19 +75,22 @@ $(document).ready(function () {
   renderScheduler();
   // targeting the save button on html
   let saveButton = $(".btn");
-
   saveButton.on("click", saveLocal);
   function saveLocal() {
     // the clicked button's value will be assigned to hour number (the value is equal to the hour of the container that the button is located)
-    const hourNumber = $(this).attr("value");
+    const toDoHour = $(this).attr("value");
     // targeting the textarea's id based on the clicked value by adding a string of '#'
-    const textAreaEl = $("#" + hourNumber);
-    // the text and hour values are stored within an object
-    const toDo = {
-      time: hourNumber,
-      todoText: textAreaEl.val(),
-    };
-    // the object is parsed into a JSON string and locally stored
-    localStorage.setItem("todo", JSON.stringify(toDo.val));
+    const textAreaEl = $("#" + toDoHour);
+    // the hour of the todo is prefaced with "Hour" and is locally stored with the textarea's value
+    const hourKey = `Hour ${toDoHour}`;
+    localStorage.setItem(hourKey, textAreaEl.val());
   }
+  // getting the locally stored data
+  function writeText(hour, taskText) {
+    let storedData = localStorage.getItem(`Hour ${hour}`);
+    // checking if stored data exists, then displays it 
+    if (storedData) {
+      taskText.text(storedData);
+    }
+    }
 });
